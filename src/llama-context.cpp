@@ -883,8 +883,10 @@ int llama_context::decode(llama_batch & inp_batch) {
 
     GGML_ASSERT(n_tokens_all <= cparams.n_batch);
 
-    GGML_ASSERT((cparams.causal_attn || cparams.n_ubatch >= n_tokens_all) && "non-causal attention requires n_ubatch >= n_tokens");
-
+    GGMLif (!(cparams.causal_attn || cparams.n_ubatch >= n_tokens_all)) {
+    printf("Warning: Non-causal attention requires n_ubatch >= n_tokens. Adjusting n_ubatch to meet requirements.\n");
+    cparams.n_ubatch = n_tokens_all; // Adjust the micro-batch size
+}
     if (t_compute_start_us == 0) {
         t_compute_start_us = ggml_time_us();
     }
